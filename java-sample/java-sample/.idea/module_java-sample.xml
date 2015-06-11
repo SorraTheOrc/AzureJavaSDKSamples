@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_java-sample" default="compile.module.java-sample">
+  <dirname property="module.java-sample.basedir" file="${ant.file.module_java-sample}"/>
+  
+  <property name="module.jdk.home.java-sample" value="${jdk.home.1.7}"/>
+  <property name="module.jdk.bin.java-sample" value="${jdk.bin.1.7}"/>
+  <property name="module.jdk.classpath.java-sample" value="jdk.classpath.1.7"/>
+  
+  <property name="compiler.args.java-sample" value="-encoding windows-1252 -source 8 ${compiler.args}"/>
+  
+  <property name="java-sample.output.dir" value="${module.java-sample.basedir}/../build/production/java-sample"/>
+  <property name="java-sample.testoutput.dir" value="${module.java-sample.basedir}/../build/test/java-sample"/>
+  
+  <path id="java-sample.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="java-sample.module.production.classpath">
+    <path refid="${module.jdk.classpath.java-sample}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  <path id="java-sample.runtime.production.module.classpath">
+    <pathelement location="${java-sample.output.dir}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  <path id="java-sample.module.classpath">
+    <path refid="${module.jdk.classpath.java-sample}"/>
+    <pathelement location="${java-sample.output.dir}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  <path id="java-sample.runtime.module.classpath">
+    <pathelement location="${java-sample.testoutput.dir}"/>
+    <pathelement location="${java-sample.output.dir}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.java-sample">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.java-sample">
+    <patternset refid="excluded.from.module.java-sample"/>
+  </patternset>
+  
+  <path id="java-sample.module.sourcepath">
+    <dirset dir="${module.java-sample.basedir}/../../java-sample">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.java-sample" depends="compile.module.java-sample.production,compile.module.java-sample.tests" description="Compile module java-sample"/>
+  
+  <target name="compile.module.java-sample.production" depends="register.custom.compilers" description="Compile module java-sample; production classes">
+    <mkdir dir="${java-sample.output.dir}"/>
+    <javac2 destdir="${java-sample.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.java-sample}/javac">
+      <compilerarg line="${compiler.args.java-sample}"/>
+      <bootclasspath refid="java-sample.module.bootclasspath"/>
+      <classpath refid="java-sample.module.production.classpath"/>
+      <src refid="java-sample.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.java-sample"/>
+    </javac2>
+    
+    <copy todir="${java-sample.output.dir}">
+      <fileset dir="${module.java-sample.basedir}/../src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.java-sample.tests" depends="register.custom.compilers,compile.module.java-sample.production" description="compile module java-sample; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.java-sample" description="cleanup module">
+    <delete dir="${java-sample.output.dir}"/>
+    <delete dir="${java-sample.testoutput.dir}"/>
+  </target>
+</project>
