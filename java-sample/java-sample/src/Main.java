@@ -46,7 +46,7 @@ public class Main {
         ExecutorService service = null;
         try {
             service = Executors.newFixedThreadPool(1);
-            context = new AuthenticationContext("https://login.windows.net" + "arm.tenant", false, service);
+            context = new AuthenticationContext("https://login.windows.net/" + "arm.tenant", false, service);
             Future<AuthenticationResult> future = context.acquireToken(
                     System.getenv(ManagementConfiguration.URI), "arm.clientid", username, password, null);
             result = future.get();
