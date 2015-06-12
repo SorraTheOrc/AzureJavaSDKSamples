@@ -1,6 +1,7 @@
 
 import com.microsoft.aad.adal4j.AuthenticationContext;
 import com.microsoft.aad.adal4j.AuthenticationResult;
+import com.microsoft.aad.adal4j.ClientCredential;
 import com.microsoft.azure.management.resources.ResourceManagementClient;
 import com.microsoft.azure.management.resources.ResourceManagementService;
 import com.microsoft.azure.management.resources.models.ResourceGroupExtended;
@@ -35,20 +36,22 @@ public class Main {
         return ManagementConfiguration.configure(
                 null,
                 new URI(baseUri),
-                System.getenv(ManagementConfiguration.SUBSCRIPTION_ID),
-                getAccessTokenFromUserCredentials(System.getenv("arm.username"), System.getenv("arm.password")).getAccessToken());
+                "cbbdaed0-fea9-4693-bf0c-d446ac93c030",
+                getAccessTokenFromUserCredentials().getAccessToken());
     }
 
-    private static AuthenticationResult getAccessTokenFromUserCredentials(
-            String username, String password) throws Exception {
+    private static AuthenticationResult getAccessTokenFromUserCredentials() throws Exception {
         AuthenticationContext context = null;
         AuthenticationResult result = null;
         ExecutorService service = null;
         try {
             service = Executors.newFixedThreadPool(1);
-            context = new AuthenticationContext("https://login.windows.net/" + "arm.tenant", false, service);
+            context = new AuthenticationContext("https://login.windows.net/" + "tenant_id",
+                    false, service);
+            ClientCredential cred = new ClientCredential("client_id",
+                    "client_secret");
             Future<AuthenticationResult> future = context.acquireToken(
-                    System.getenv(ManagementConfiguration.URI), "arm.clientid", username, password, null);
+                    "https://management.azure.com/", cred, null);
             result = future.get();
         } finally {
             service.shutdown();
